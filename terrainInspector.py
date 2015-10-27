@@ -11,22 +11,13 @@ def drawTerrain(src, count):
             terrain = src.extractfile(member.name).read()
 
             img = Image.new('F', (count*256, count*256), "black")
-            pixels = img.load()
 
-            t = []
-            c = 0
-            while c < len(terrain):
-                t.append(struct.unpack('f', ''.join(i for i in terrain[c:c+4])))
-                c += 4
+            t = struct.unpack('<%sf' % (len(terrain) // 4), terrain)
+            img.putdata(t)
 
             if img.size[0]*img.size[1] > len(t):
                 print src.name
                 print "Error, image larger than encoded data: %dx%d vs %d" % (img.size[0], img.size[1], len(t))
-
-            for i in range(img.size[0]):
-                for j in range(img.size[1]):
-                    pixels[i,j] = t[i + j*img.size[0]][0]
-
 
             return img
 
