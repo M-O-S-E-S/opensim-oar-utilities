@@ -3,7 +3,7 @@
 from PIL import Image
 import xml.etree.cElementTree as ET
 import struct, sys, tarfile
-from main import getRegionCount
+from split import getRegionCount
 
 def writeRegionObjects(src, img):
     pixels = img.load()
@@ -39,6 +39,7 @@ if __name__ == "__main__":
                     else:
                         img = Image.new('F', (count*256, count*256), "black")
                         writeRegionObjects(tf, img)
+                        img = img.transpose(Image.FLIP_TOP_BOTTOM)
                         img.show()
                 else:
                     print "invalid oar file"

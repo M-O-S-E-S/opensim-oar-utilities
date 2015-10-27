@@ -2,7 +2,7 @@
 
 from terrainInspector import drawTerrain
 from objectInspector import writeRegionObjects
-from main import getRegionCount
+from split import getRegionCount
 from PIL import Image
 import sys, tarfile
 
@@ -22,6 +22,7 @@ if __name__ == "__main__":
                     else:
                         img = drawTerrain(tf, count)
                         writeRegionObjects(tf, img)
+                        img = img.transpose(Image.FLIP_TOP_BOTTOM)
                         img.show(title=oarFile)
                 else:
                     print "invalid oar file"

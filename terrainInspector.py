@@ -3,7 +3,7 @@
 from PIL import Image
 import xml.etree.cElementTree as ET
 import struct, sys, tarfile
-from main import getRegionCount
+from split import getRegionCount
 
 def drawTerrain(src, count):
     for member in src.getmembers():
@@ -46,6 +46,7 @@ if __name__ == "__main__":
                         print "This is not a var-region archive, refusing to split"
                     else:
                         img = drawTerrain(tf, count)
+                        img = img.transpose(Image.FLIP_TOP_BOTTOM)
                         img.show()
                 else:
                     print "invalid oar file"

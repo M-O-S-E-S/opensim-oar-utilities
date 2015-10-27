@@ -143,7 +143,7 @@ def splitArchive(tf, rootName, count):
     print "Splitting the oarfile"
     for x in range(count):
         for y in range(count):
-            oarName = "%s-%d,%d.tar.gz" % (rootName, x, y)
+            oarName = "%s-%d,%d.oar" % (rootName, x, y)
             print "Creating oar %s" % oarName
             nf = tarfile.open(oarName, "w:gz")
             archiveFile = StringIO.StringIO(archiveXML)
