@@ -58,9 +58,9 @@ def copyRegionObjects(src, dst, offset_x, offset_y):
             file = tf.extractfile(member.name)
             tree = ET.fromstring(file.read().encode('utf-16-be'))
             xNode = tree.find('./SceneObjectPart/GroupPosition/X')
-            x = float(xNode.text) - offset_x
+            x = float(xNode.text) - offset_y
             yNode = tree.find('./SceneObjectPart/GroupPosition/Y')
-            y = float(yNode.text) - offset_y
+            y = float(yNode.text) - offset_x
             if x < 0 or x > 255:
                 skippedObjects += 1
                 continue
@@ -113,6 +113,7 @@ def copyTerrain(src, dst, x, y, count):
 
                 terrainCache[member.name] = img
 
+            #crop: left, top, width, height
             img = img.crop( (x,y,x+256,y+256) )
 
             pixels = img.load()
@@ -124,6 +125,7 @@ def copyTerrain(src, dst, x, y, count):
             archiveFile = StringIO.StringIO(imgString)
             info = tarfile.TarInfo(name=member.name)
             info.size = len(archiveFile.buf)
+            print "Writing terrain with %d bytes" % len(archiveFile.buf)
             dst.addfile(tarinfo=info, fileobj=archiveFile)
 
 

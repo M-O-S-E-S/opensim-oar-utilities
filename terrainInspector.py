@@ -3,26 +3,12 @@
 from PIL import Image
 import xml.etree.cElementTree as ET
 import struct, sys, tarfile
+from main import getRegionCount
 
-def getRegionCount(tf):
-    file = tf.extractfile(tf.firstmember)
-    tree = ET.fromstring(file.read().encode('utf-16-be'))
-    info = tree.find("region_info")
-    if info.find("is_megaregion").text == "True":
-        # we cannot split megaregions
-        return -1
-    x,y = info.find("size_in_meters").text.split(",")
-    x = int(x)
-    y = int(y)
-    if x != y:
-        # var regions are only round
-        return -1
-    return x/256
-
-def showTerrain(src, count):
+def drawTerrain(src, count):
     for member in src.getmembers():
         if member.name.startswith("terrains"):
-            terrain = tf.extractfile(member.name).read()
+            terrain = src.extractfile(member.name).read()
 
             img = Image.new('F', (count*256, count*256), "black")
             pixels = img.load()
@@ -33,12 +19,16 @@ def showTerrain(src, count):
                 t.append(struct.unpack('f', ''.join(i for i in terrain[c:c+4])))
                 c += 4
 
+            if img.size[0]*img.size[1] > len(t):
+                print src.name
+                print "Error, image larger than encoded data: %dx%d vs %d" % (img.size[0], img.size[1], len(t))
+
             for i in range(img.size[0]):
                 for j in range(img.size[1]):
                     pixels[i,j] = t[i + j*img.size[0]][0]
 
 
-            img.show()
+            return img
 
 
 if __name__ == "__main__":
@@ -55,7 +45,8 @@ if __name__ == "__main__":
                     if count < 1:
                         print "This is not a var-region archive, refusing to split"
                     else:
-                        showTerrain(tf, count)
+                        img = drawTerrain(tf, count)
+                        img.show()
                 else:
                     print "invalid oar file"
             else:

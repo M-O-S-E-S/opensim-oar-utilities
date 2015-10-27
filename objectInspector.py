@@ -3,27 +3,13 @@
 from PIL import Image
 import xml.etree.cElementTree as ET
 import struct, sys, tarfile
-
-def getRegionCount(tf):
-    file = tf.extractfile(tf.firstmember)
-    tree = ET.fromstring(file.read().encode('utf-16-be'))
-    info = tree.find("region_info")
-    if info.find("is_megaregion").text == "True":
-        # we cannot split megaregions
-        return -1
-    x,y = info.find("size_in_meters").text.split(",")
-    x = int(x)
-    y = int(y)
-    if x != y:
-        # var regions are only round
-        return -1
-    return x/256
+from main import getRegionCount
 
 def writeRegionObjects(src, img):
     pixels = img.load()
     for member in src.getmembers():
         if member.name.startswith("objects"):
-            file = tf.extractfile(member.name)
+            file = src.extractfile(member.name)
             tree = ET.fromstring(file.read().encode('utf-16-be'))
             xNode = tree.find('./SceneObjectPart/GroupPosition/X')
             x = int(float(xNode.text))
