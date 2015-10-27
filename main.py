@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-import sys, tarfile, StringIO
+import sys, tarfile, StringIO, struct
 import xml.etree.cElementTree as ET
+from PIL import Image
+
 
 def getRegionCount(tf):
     file = tf.extractfile(tf.firstmember)
@@ -86,9 +88,6 @@ def copyRegionObjects(src, dst, offset_x, offset_y):
 
 terrainCache = {}
 
-from PIL import Image
-import struct
-
 def copyTerrain(src, dst, x, y, count):
     print "region terrain block %d, %d" % (x, y)
     for member in src.getmembers():
@@ -110,12 +109,11 @@ def copyTerrain(src, dst, x, y, count):
 
                 for i in range(img.size[0]):
                     for j in range(img.size[1]):
-                        pixels[i,j] = t[i + (img.size[0]-1-j)*img.size[0]][0]
+                        pixels[i,j] = t[j + i*img.size[0]][0]
 
                 terrainCache[member.name] = img
 
             img = img.crop( (x,y,x+256,y+256) )
-            img.show()
 
             pixels = img.load()
             imgString = ''
